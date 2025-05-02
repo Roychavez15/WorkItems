@@ -14,7 +14,7 @@ namespace WorkItems.FrontEnd.Services
             _httpClient = httpClient;
             _configuration = configuration;
             //_apiUrl = _configuration["UserService:BaseUrl"];
-            _apiUrl = "https://localhost:7186/api/users";
+            _apiUrl = "https://localhost:7013/api/users";
         }
 
         public async Task<List<User>> GetUsersAsync()

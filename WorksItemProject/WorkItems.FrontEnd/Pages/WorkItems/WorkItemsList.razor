@@ -1,0 +1,102 @@
+﻿@page "/workitems"
+
+@inject WorkItemService WorkItemService
+
+<h3>Work Items</h3>
+
+<button class="btn btn-primary mb-3" @onclick="ShowCreateModal">Crear Nuevo WorkItem</button>
+
+@if (workItems == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Fecha Límite</th>
+                <th>Relevancia</th>
+                <th>Asignado A</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in workItems)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Title</td>
+                    <td>@item.DueDate.ToShortDateString()</td>
+                    <td>@item.Relevance</td>
+                    <td>@(item.AssignedUser?.FullName ?? "No asignado")</td>
+                    <td>@(item.IsCompleted ? "Completado" : "Pendiente")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Modal para Crear -->
+@if (showModal)
+{
+    <div class="modal-background" @onclick="CloseModal">
+        <div class="modal-dialog" @onclick:stopPropagation="true">
+            <h4>Nuevo Work Item</h4>
+            <div class="form-group">
+                <label>Título:</label>
+                <input class="form-control" @bind="newWorkItem.Title" />
+            </div>
+            <div class="form-group">
+                <label>Fecha Límite:</label>
+                <input type="date" class="form-control" @bind="newWorkItem.DueDate" />
+            </div>
+            <div class="form-group">
+                <label>Relevancia:</label>
+                <select class="form-control" @bind="newWorkItem.Relevance">
+                    <option value="Low">Baja</option>
+                    <option value="Medium">Media</option>
+                    <option value="High">Alta</option>
+                </select>
+            </div>
+            <button class="btn btn-success mt-2" @onclick="CreateWorkItem">Crear</button>
+            <button class="btn btn-secondary mt-2" @onclick="CloseModal">Cancelar</button>
+        </div>
+    </div>
+}
+
+@code {
+    private List<WorkItem> workItems;
+    private WorkItem newWorkItem = new();
+    private bool showModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkItems();
+    }
+
+    private async Task LoadWorkItems()
+    {
+        workItems = await WorkItemService.GetWorkItemsAsync();
+    }
+
+    private void ShowCreateModal()
+    {
+        newWorkItem = new WorkItem { DueDate = DateTime.Today };
+        showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private async Task CreateWorkItem()
+    {
+        await WorkItemService.CreateWorkItemAsync(newWorkItem);
+        await LoadWorkItems();
+        CloseModal();
+    }
+}

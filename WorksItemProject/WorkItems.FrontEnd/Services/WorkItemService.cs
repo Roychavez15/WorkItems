@@ -14,7 +14,7 @@ namespace WorkItems.FrontEnd.Services
             _httpClient = httpClient;
             _configuration = configuration;
             //_apiUrl = _configuration["WorkItemService:BaseUrl"];
-            _apiUrl = "https://localhost:7209/api/workitems";
+            _apiUrl = "https://localhost:7198/api/workitems";
         }
 
         public async Task<List<WorkItem>> GetWorkItemsAsync()
